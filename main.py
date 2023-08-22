@@ -49,8 +49,21 @@ class Payment(Resource):
 
         return {'payments': payments}
 
+    def put(self, payment_id):
+        data = request.get_json()
+        date = data['date']
+        amount = data['amount']
 
-api.add_resource(Payment, '/payments')
+        conn = sqlite3.connect('payments.db')
+        c = conn.cursor()
+        c.execute("UPDATE payments SET date = ?, amount = ? WHERE id = ?", (date, amount, payment_id))
+        conn.commit()
+        conn.close()
+
+        return {'message': 'Платеж успешно обновлен'}
+
+
+api.add_resource(Payment, '/payments', '/payments/<int:payment_id>')
 
 if __name__ == '__main__':
     app.run(debug=True)
